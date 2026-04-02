@@ -8,24 +8,29 @@ metadata: {"openclaw":{"emoji":"🤖","requires":{"env":["DEMO_SHEET_URL"],"bins
 
 # AI派遣社員デモ — ニュース収集 → スプレッドシート転記
 
-## ⚠️ 絶対ルール — 必ず守ること
+## 使用ツール
 
-1. **OpenClaw の `browser` ツール（Playwright / headless）は絶対に使わない。**
-   - `browser` action=navigate, snapshot, screenshot, act 等は全て禁止。
-   - スクリーンショットを撮って Slack に送信する行為も禁止。
-2. **全てのブラウザ操作は `exec` ツールで `xdotool` コマンドを実行して行う。**
-3. **ページ内容の取得は `exec` ツールで `python3 "$_S/get_page_text.py"` を実行して行う。**
-4. VNC 画面に操作が映ることがこのスキルの目的。headless で動かしたら意味がない。
+このスキルで使うツールは **`exec` のみ**。それ以外のツールは一切使わない。
+
+| やりたいこと | 使うツール | コマンド |
+|-------------|-----------|---------|
+| URL遷移 | `exec` | `xdotool key ctrl+l` → `xdotool type` → `xdotool key Return` |
+| クリック | `exec` | `xdotool mousemove` → `xdotool click 1` |
+| テキスト入力 | `exec` | `xdotool type --delay 30 "テキスト"` |
+| キー操作 | `exec` | `xdotool key Tab` / `xdotool key Return` 等 |
+| スクロール | `exec` | `xdotool click --repeat 3 --delay 100 5` |
+| ページ内容取得 | `exec` | `python3 "$_S/get_page_text.py"` |
+| 画面の状態確認 | VNC経由で人間が目視 | （AIは確認不要。操作を続行する） |
 
 ## 概要
 
 https://ab-hd.co.jp/ のニュース一覧から最新ニュースを収集し、Googleスプレッドシートに転記する。
 デモ用途のため、**すべてのブラウザ操作を人間が操作しているように見せる**。
 
-ブラウザ操作は **Xvfb 上の snap 版 Chromium を `xdotool` で制御** する。
-VNC 越しにマウスカーソルの動きやキー入力が見える。
+ブラウザ操作は **Xvfb 上の snap 版 Chromium を `exec` ツールで `xdotool` コマンドを使って制御** する。
+VNC 越しにマウスカーソルの動きやキー入力がリアルタイムで見える。
 
-Chromium は `--remote-debugging-port=9222` 付きで起動し、
+Chromium は `--remote-debugging-port=9222` 付きで起動済み。
 xdotool による画面操作と CDP（`get_page_text.py`）によるページ内容取得を両立する。
 既に systemd で Xvfb/x11vnc が常駐している環境では、start_display.sh がそれを検出してスキップする。
 
