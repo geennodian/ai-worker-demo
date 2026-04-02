@@ -47,6 +47,7 @@ chromium-browser \
   --no-sandbox \
   --disable-gpu \
   --disable-dev-shm-usage \
+  --remote-debugging-port=9222 \
   --window-size=1920,1080 \
   --start-maximized \
   --no-first-run \
@@ -72,6 +73,7 @@ else
   echo "  VNCパスワード: なし"
 fi
 echo ""
+echo "  Chrome DevTools: http://localhost:9222"
 echo "  VNC Viewer で ${TS_IP}:${VNC_PORT} に接続してください。"
 echo "  停止するには: stop_display.sh"
 echo "========================================"
