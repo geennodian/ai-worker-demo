@@ -8,18 +8,26 @@ metadata: {"openclaw":{"emoji":"🤖","requires":{"env":["DEMO_SHEET_URL"],"bins
 
 # AI派遣社員デモ — ニュース収集 → スプレッドシート転記
 
+## ⚠️ 絶対ルール — 必ず守ること
+
+1. **OpenClaw の `browser` ツール（Playwright / headless）は絶対に使わない。**
+   - `browser` action=navigate, snapshot, screenshot, act 等は全て禁止。
+   - スクリーンショットを撮って Slack に送信する行為も禁止。
+2. **全てのブラウザ操作は `exec` ツールで `xdotool` コマンドを実行して行う。**
+3. **ページ内容の取得は `exec` ツールで `python3 "$_S/get_page_text.py"` を実行して行う。**
+4. VNC 画面に操作が映ることがこのスキルの目的。headless で動かしたら意味がない。
+
 ## 概要
 
 https://ab-hd.co.jp/ のニュース一覧から最新ニュースを収集し、Googleスプレッドシートに転記する。
 デモ用途のため、**すべてのブラウザ操作を人間が操作しているように見せる**。
 
-ブラウザ操作は **Xvfb 上の Chromium を `xdotool` で制御** する。
+ブラウザ操作は **Xvfb 上の snap 版 Chromium を `xdotool` で制御** する。
 VNC 越しにマウスカーソルの動きやキー入力が見える。
 
-> **注意**: headless ブラウザ（Playwright等）ではなく、Xvfb 上で GUI 表示される
-> snap 版 `chromium-browser` を使用する。`--remote-debugging-port=9222` 付きで
-> 起動し、xdotool による画面操作と CDP によるページ内容取得を両立する。
-> 既に systemd で Xvfb/x11vnc が常駐している環境では、start_display.sh がそれを検出してスキップする。
+Chromium は `--remote-debugging-port=9222` 付きで起動し、
+xdotool による画面操作と CDP（`get_page_text.py`）によるページ内容取得を両立する。
+既に systemd で Xvfb/x11vnc が常駐している環境では、start_display.sh がそれを検出してスキップする。
 
 ## 環境変数
 
